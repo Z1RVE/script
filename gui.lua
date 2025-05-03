@@ -5,11 +5,11 @@ local RunService = game:GetService("RunService")
 -- Sabitler ve Varsayılanlar
 local CONFIG = {
     DEFAULT_COLORS = {
-        primary = Color3.fromRGB(100, 100, 255),
-        secondary = Color3.fromRGB(50, 50, 50),
-        background = Color3.fromRGB(30, 30, 30),
+        primary = Color3.fromRGB(130, 90, 153), -- Style.primaryColor
+        secondary = Color3.fromRGB(166, 128, 191), -- Style.secondaryColor
+        background = Color3.fromRGB(26, 0, 51), -- Style.backgroundColor
         text = Color3.fromRGB(220, 220, 220),
-        accent = Color3.fromRGB(150, 150, 255),
+        accent = Color3.fromRGB(200, 150, 255),
     },
     DEFAULT_FONT = Enum.Font.Gotham,
     ANIMATION_INFO = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -96,16 +96,15 @@ function erismodulargui:Initialize(modularInfo)
         textColor = modularInfo.textColor or CONFIG.DEFAULT_COLORS.text,
         accentColor = modularInfo.accentColor or CONFIG.DEFAULT_COLORS.accent,
         font = modularInfo.font or CONFIG.DEFAULT_FONT,
-        name = modularInfo.name or "Modern GUI",
-        size = modularInfo.size or UDim2.new(0.5, 0, 0.7, 0),
-        barHeight = modularInfo.barHeight or 40,
+        name = modularInfo.name or "No Big Deal GUI",
+        size = modularInfo.size or UDim2.new(0, 600, 0, 420),
+        barY = modularInfo.barY or 20,
         maxPages = modularInfo.maxPages or 3,
         draggable = modularInfo.draggable or true,
-        centered = modularInfo.centered == nil and true or modularInfo.centered,
-        freemouse = modularInfo.freemouse or false,
+        centered = modularInfo.centered == nil and false or modularInfo.centered,
+        freemouse = modularInfo.freemouse or true,
         toggleBind = modularInfo.toggleBind or nil,
         startMinimized = modularInfo.startMinimized or false,
-        theme = modularInfo.theme or "dark", -- Tema desteği
     }
 
     -- GUI Oluşturma
@@ -135,6 +134,15 @@ function erismodulargui:Initialize(modularInfo)
     newGUI.IgnoreGuiInset = true
     self.GUI = newGUI
 
+    -- Free Mouse Desteği
+    local freeMouseButton = Instance.new("TextButton", newGUI)
+    freeMouseButton.Size = UDim2.new(1, 0, 1, 0)
+    freeMouseButton.BackgroundTransparency = 1
+    freeMouseButton.Text = ""
+    freeMouseButton.Interactable = false
+    freeMouseButton.Modal = modularInfo.freemouse
+    freeMouseButton.Visible = not modularInfo.startMinimized
+
     -- Ana Çerçeve
     local newMainFrame = Instance.new("Frame", newGUI)
     newMainFrame.Size = modularInfo.size
@@ -153,7 +161,7 @@ function erismodulargui:Initialize(modularInfo)
 
     -- Üst Çubuk
     local topBar = Instance.new("Frame", newMainFrame)
-    topBar.Size = UDim2.new(1, 0, 0, modularInfo.barHeight)
+    topBar.Size = UDim2.new(1, 0, 0, modularInfo.barY)
     topBar.BackgroundColor3 = modularInfo.primaryColor
     topBar.BorderSizePixel = 0
     applyCorner(topBar)
@@ -169,12 +177,12 @@ function erismodulargui:Initialize(modularInfo)
     titleLabel.Font = modularInfo.font
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     local titlePadding = Instance.new("UIPadding", titleLabel)
-    titlePadding.PaddingLeft = UDim.new(0, 15)
+    titlePadding.PaddingLeft = UDim.new(0, 10)
 
     -- Kapatma Düğmesi
     local closeButton = Instance.new("TextButton", topBar)
-    closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.Position = UDim2.new(1, -10, 0.5, 0)
+    closeButton.Size = UDim2.new(0, modularInfo.barY, 0, modularInfo.barY)
+    closeButton.Position = UDim2.new(1, -5, 0.5, 0)
     closeButton.AnchorPoint = Vector2.new(1, 0.5)
     closeButton.BackgroundColor3 = modularInfo.secondaryColor
     closeButton.TextColor3 = modularInfo.textColor
@@ -190,8 +198,8 @@ function erismodulargui:Initialize(modularInfo)
 
     -- Küçültme Düğmesi
     local minimizeButton = Instance.new("TextButton", topBar)
-    minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-    minimizeButton.Position = UDim2.new(1, -50, 0.5, 0)
+    minimizeButton.Size = UDim2.new(0, modularInfo.barY, 0, modularInfo.barY)
+    minimizeButton.Position = UDim2.new(1, -modularInfo.barY - 10, 0.5, 0)
     minimizeButton.AnchorPoint = Vector2.new(1, 0.5)
     minimizeButton.BackgroundColor3 = modularInfo.secondaryColor
     minimizeButton.TextColor3 = modularInfo.textColor
@@ -202,7 +210,7 @@ function erismodulargui:Initialize(modularInfo)
 
     -- Maksimize Düğmesi
     local maximizeButton = Instance.new("TextButton", newGUI)
-    maximizeButton.Size = UDim2.new(0, 30, 0, 30)
+    maximizeButton.Size = UDim2.new(0, modularInfo.barY, 0, modularInfo.barY)
     maximizeButton.Position = UDim2.new(1, -10, 1, -10)
     maximizeButton.AnchorPoint = Vector2.new(1, 1)
     maximizeButton.BackgroundColor3 = modularInfo.secondaryColor
@@ -215,15 +223,15 @@ function erismodulargui:Initialize(modularInfo)
 
     -- Sayfa Seçici
     local pageSelector = Instance.new("Frame", newMainFrame)
-    pageSelector.Size = UDim2.new(1, 0, 0, 30)
-    pageSelector.Position = UDim2.new(0, 0, 0, modularInfo.barHeight)
+    pageSelector.Size = UDim2.new(1, 0, 0, modularInfo.barY)
+    pageSelector.Position = UDim2.new(0, 0, 0, modularInfo.barY)
     pageSelector.BackgroundColor3 = modularInfo.secondaryColor
     pageSelector.BorderSizePixel = 0
     applyCorner(pageSelector)
 
     local leftPageButton = Instance.new("TextButton", pageSelector)
-    leftPageButton.Size = UDim2.new(0, 30, 0, 30)
-    leftPageButton.Position = UDim2.new(0, 10, 0.5, 0)
+    leftPageButton.Size = UDim2.new(0, modularInfo.barY, 0, modularInfo.barY)
+    leftPageButton.Position = UDim2.new(0, 5, 0.5, 0)
     leftPageButton.AnchorPoint = Vector2.new(0, 0.5)
     leftPageButton.BackgroundColor3 = modularInfo.accentColor
     leftPageButton.TextColor3 = modularInfo.textColor
@@ -233,8 +241,8 @@ function erismodulargui:Initialize(modularInfo)
     applyCorner(leftPageButton)
 
     local rightPageButton = Instance.new("TextButton", pageSelector)
-    rightPageButton.Size = UDim2.new(0, 30, 0, 30)
-    rightPageButton.Position = UDim2.new(1, -10, 0.5, 0)
+    rightPageButton.Size = UDim2.new(0, modularInfo.barY, 0, modularInfo.barY)
+    rightPageButton.Position = UDim2.new(1, -5, 0.5, 0)
     rightPageButton.AnchorPoint = Vector2.new(1, 0.5)
     rightPageButton.BackgroundColor3 = modularInfo.accentColor
     rightPageButton.TextColor3 = modularInfo.textColor
@@ -255,27 +263,28 @@ function erismodulargui:Initialize(modularInfo)
 
     -- İçerik Alanı
     local mainContentFrame = Instance.new("Frame", newMainFrame)
-    mainContentFrame.Size = UDim2.new(1, 0, 1, -(modularInfo.barHeight + 30))
+    mainContentFrame.Size = UDim2.new(1, 0, 1, -(modularInfo.barY * 2))
     mainContentFrame.Position = UDim2.new(0, 0, 1, 0)
     mainContentFrame.AnchorPoint = Vector2.new(0, 1)
     mainContentFrame.BackgroundTransparency = 1
     local contentGrid = Instance.new("UIGridLayout", mainContentFrame)
     contentGrid.CellSize = UDim2.new(1 / modularInfo.maxPages, 0, 1, 0)
-    contentGrid.CellPadding = UDim.new(0, 10)
+    contentGrid.CellPadding = UDim.new(0, 5)
     contentGrid.SortOrder = Enum.SortOrder.LayoutOrder
 
     -- Küçültme/Maksimize İşlevi
     local minimized = modularInfo.startMinimized
     local function handleMinimize()
         minimized = not minimized
+        freeMouseButton.Visible = not minimized
         if minimized then
-            createTween(newMainFrame, {Size = UDim2.new(0, 200, 0, modularInfo.barHeight)}):Play()
-            createTween(pageSelector, {Position = UDim2.new(0, 0, 0, -30)}):Play()
+            createTween(newMainFrame, {Size = UDim2.new(0, 200, 0, modularInfo.barY)}):Play()
+            createTween(pageSelector, {Position = UDim2.new(0, 0, 0, -modularInfo.barY)}):Play()
             mainContentFrame.Visible = false
             maximizeButton.Visible = true
         else
             createTween(newMainFrame, {Size = modularInfo.size}):Play()
-            createTween(pageSelector, {Position = UDim2.new(0, 0, 0, modularInfo.barHeight)}):Play()
+            createTween(pageSelector, {Position = UDim2.new(0, 0, 0, modularInfo.barY)}):Play()
             mainContentFrame.Visible = true
             maximizeButton.Visible = false
         end
@@ -389,7 +398,7 @@ function erismodulargui:Initialize(modularInfo)
         applyCorner(moduleFrame)
 
         local moduleTitle = Instance.new("TextLabel", moduleFrame)
-        moduleTitle.Size = UDim2.new(1, 0, 0, modularInfo.barHeight)
+        moduleTitle.Size = UDim2.new(1, 0, 0, modularInfo.barY)
         moduleTitle.Text = title
         moduleTitle.TextColor3 = modularInfo.textColor
         moduleTitle.BackgroundColor3 = modularInfo.secondaryColor
@@ -399,22 +408,22 @@ function erismodulargui:Initialize(modularInfo)
         applyGradient(moduleTitle, modularInfo.secondaryColor, modularInfo.accentColor)
 
         local contentBox = Instance.new("Frame", moduleFrame)
-        contentBox.Size = UDim2.new(1, 0, 1, -modularInfo.barHeight)
-        contentBox.Position = UDim2.new(0, 0, 0, modularInfo.barHeight)
+        contentBox.Size = UDim2.new(1, 0, 1, -modularInfo.barY)
+        contentBox.Position = UDim2.new(0, 0, 0, modularInfo.barY)
         contentBox.BackgroundTransparency = 0.2
         contentBox.BackgroundColor3 = modularInfo.backgroundColor
         applyCorner(contentBox)
         local contentList = Instance.new("UIListLayout", contentBox)
-        contentList.Padding = UDim.new(0, 10)
+        contentList.Padding = UDim.new(0, 5)
         contentList.SortOrder = Enum.SortOrder.LayoutOrder
         local contentPadding = Instance.new("UIPadding", contentBox)
-        contentPadding.PaddingAll = UDim.new(0, 10)
+        contentPadding.PaddingAll = UDim.new(0, 5)
 
         local module = { Frame = moduleFrame }
 
         function module:AddText(text)
             local textLabel = Instance.new("TextLabel", contentBox)
-            textLabel.Size = UDim2.new(1, 0, 0, 30)
+            textLabel.Size = UDim2.new(1, 0, 0, modularInfo.barY)
             textLabel.Text = text
             textLabel.TextScaled = true
             textLabel.Font = modularInfo.font
@@ -433,7 +442,7 @@ function erismodulargui:Initialize(modularInfo)
 
         function module:AddButton(buttonText)
             local button = Instance.new("TextButton", contentBox)
-            button.Size = UDim2.new(1, 0, 0, 40)
+            button.Size = UDim2.new(1, 0, 0, modularInfo.barY + 10)
             button.Text = buttonText
             button.TextScaled = true
             button.Font = modularInfo.font
@@ -447,7 +456,7 @@ function erismodulargui:Initialize(modularInfo)
         function module:AddToggle(toggleText)
             local toggleData = { state = false }
             local toggleButton = Instance.new("TextButton", contentBox)
-            toggleButton.Size = UDim2.new(1, 0, 0, 40)
+            toggleButton.Size = UDim2.new(1, 0, 0, modularInfo.barY + 10)
             toggleButton.Text = toggleText .. ": OFF"
             toggleButton.TextScaled = true
             toggleButton.Font = modularInfo.font
@@ -471,11 +480,11 @@ function erismodulargui:Initialize(modularInfo)
 
         function module:AddList(listTitle)
             local listContainer = Instance.new("Frame", contentBox)
-            listContainer.Size = UDim2.new(1, 0, 0, 40)
+            listContainer.Size = UDim2.new(1, 0, 0, modularInfo.barY + 10)
             listContainer.BackgroundTransparency = 1
 
             local titleButton = Instance.new("TextButton", listContainer)
-            titleButton.Size = UDim2.new(1, 0, 0, 40)
+            titleButton.Size = UDim2.new(1, 0, 0, modularInfo.barY + 10)
             titleButton.Text = listTitle
             titleButton.TextScaled = true
             titleButton.Font = modularInfo.font
@@ -485,7 +494,7 @@ function erismodulargui:Initialize(modularInfo)
             applyHoverEffect(titleButton)
 
             local itemListFrame = Instance.new("ScrollingFrame", listContainer)
-            itemListFrame.Size = UDim2.new(1, 0, 0, 120)
+            itemListFrame.Size = UDim2.new(1, 0, 0, 100)
             itemListFrame.Position = UDim2.new(0, 0, 1, 0)
             itemListFrame.BackgroundColor3 = modularInfo.backgroundColor
             itemListFrame.BackgroundTransparency = 0.2
@@ -512,7 +521,7 @@ function erismodulargui:Initialize(modularInfo)
             function listObject:AddListItem(itemText, relatedValue)
                 relatedValue = relatedValue or itemText
                 local itemButton = Instance.new("TextButton", itemListFrame)
-                itemButton.Size = UDim2.new(1, 0, 0, 30)
+                itemButton.Size = UDim2.new(1, 0, 0, modularInfo.barY)
                 itemButton.Text = itemText
                 itemButton.TextScaled = true
                 itemButton.Font = modularInfo.font
@@ -541,11 +550,11 @@ function erismodulargui:Initialize(modularInfo)
 
         function module:AddSlider(sliderText, min, max)
             local sliderFrame = Instance.new("Frame", contentBox)
-            sliderFrame.Size = UDim2.new(1, 0, 0, 60)
+            sliderFrame.Size = UDim2.new(1, 0, 0, modularInfo.barY + 30)
             sliderFrame.BackgroundTransparency = 1
 
             local sliderLabel = Instance.new("TextLabel", sliderFrame)
-            sliderLabel.Size = UDim2.new(1, 0, 0, 20)
+            sliderLabel.Size = UDim2.new(1, 0, 0, modularInfo.barY)
             sliderLabel.Text = sliderText .. ": " .. string.format("%.2f", min)
             sliderLabel.TextScaled = true
             sliderLabel.Font = modularInfo.font
@@ -553,8 +562,8 @@ function erismodulargui:Initialize(modularInfo)
             sliderLabel.BackgroundTransparency = 1
 
             local sliderHolder = Instance.new("Frame", sliderFrame)
-            sliderHolder.Size = UDim2.new(1, 0, 0, 20)
-            sliderHolder.Position = UDim2.new(0, 0, 0, 30)
+            sliderHolder.Size = UDim2.new(1, 0, 0, modularInfo.barY)
+            sliderHolder.Position = UDim2.new(0, 0, 0, modularInfo.barY + 10)
             sliderHolder.BackgroundColor3 = modularInfo.secondaryColor
             applyCorner(sliderHolder)
 
@@ -566,7 +575,7 @@ function erismodulargui:Initialize(modularInfo)
             applyCorner(sliderBar)
 
             local sliderButton = Instance.new("TextButton", sliderBar)
-            sliderButton.Size = UDim2.new(0, 20, 1.5, 0)
+            sliderButton.Size = UDim2.new(0, modularInfo.barY, 1.5, 0)
             sliderButton.Position = UDim2.new(0, 0, 0.5, 0)
             sliderButton.AnchorPoint = Vector2.new(0, 0.5)
             sliderButton.BackgroundColor3 = modularInfo.primaryColor
@@ -624,6 +633,13 @@ function erismodulargui:Initialize(modularInfo)
         table.insert(createdModules, module)
         updateModuleVisibility()
         return module
+    end
+
+    -- Destroy Metodu
+    function self:Destroy()
+        createTween(newGUI, {Enabled = false}):Play()
+        wait(0.3)
+        newGUI:Destroy()
     end
 
     return self
